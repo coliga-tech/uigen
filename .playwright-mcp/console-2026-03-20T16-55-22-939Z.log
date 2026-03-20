@@ -1,0 +1,61 @@
+[  378680ms] [ERROR] The final argument passed to %s changed size between renders. The order and size of this array must remain constant.
+
+Previous: %s
+Incoming: %s useEffect [] [, (toolCall)=>{
+            const { toolName, args } = toolCall;
+            // Handle str_replace_editor tool
+            if (toolName === "str_replace_editor" && args) {
+                const { command, path, file_text, old_str, new_str, insert_line } = args;
+                switch(command){
+                    case "create":
+                        if (path && file_text !== undefined) {
+                            const result = fileSystem.createFileWithParents(path, file_text);
+                            if (!result.startsWith("Error:")) {
+                                createFile(path, file_text);
+                            }
+                        }
+                        break;
+                    case "str_replace":
+                        if (path && old_str !== undefined && new_str !== undefined) {
+                            const result = fileSystem.replaceInFile(path, old_str, new_str);
+                            if (!result.startsWith("Error:")) {
+                                const content = fileSystem.readFile(path);
+                                if (content !== null) {
+                                    updateFile(path, content);
+                                }
+                            }
+                        }
+                        break;
+                    case "insert":
+                        if (path && new_str !== undefined && insert_line !== undefined) {
+                            const result = fileSystem.insertInFile(path, insert_line, new_str);
+                            if (!result.startsWith("Error:")) {
+                                const content = fileSystem.readFile(path);
+                                if (content !== null) {
+                                    updateFile(path, content);
+                                }
+                            }
+                        }
+                        break;
+                }
+            }
+            // Handle file_manager tool
+            if (toolName === "file_manager" && args) {
+                const { command, path, new_path } = args;
+                switch(command){
+                    case "rename":
+                        if (path && new_path) {
+                            renameFile(path, new_path);
+                        }
+                        break;
+                    case "delete":
+                        if (path) {
+                            const success = fileSystem.deleteFile(path);
+                            if (success) {
+                                deleteFile(path);
+                            }
+                        }
+                        break;
+                }
+            }
+        }] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_b0daae9a._.js:2359
